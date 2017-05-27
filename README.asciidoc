@@ -1,0 +1,31 @@
+kakoune-nightly
+---------------
+
+This repository contains the files necessary to build Archlinux packages
+of the https://github.com/mawww/kakoune/[kakoune] project, along with a
+customized version using a few pull requests proposed by contributors.
+
+Notes
+~~~~~
+
+Here are a few notes about the packages and how they are generated:
+
+* the version of the package is generated after some `git` metadata
+  (e.g. commits count/hash)
+* build flags provided by `makepkg` are ignored to allow the project to
+  compiled with the exact same options that its author intended it to be
+  built with
+* the paths to the `ccache` compiler are hardcoded, making any hardening
+  of the binary through the usual means (i.e. a `g++` wrapper)
+  impossible
+* the "categories" of builds are exclusive, but only inter-category
+  packages are declared as conflicting to the package manager so as not
+  to have to edit all the `PKGBUILD` files every time a new category is
+  created
+
+  Example: the `kakoune-nightly` and `kakoune-nightly-debug` builds
+  can't be installed together, the package manager knows they are
+  conflicting packages. However the `kakoune-nightly-lenormf` and
+  `kakoune-nightly` packages don't explicitly conflict: the package
+  manager will gladly try to install them along side of each other, but
+  will fail because they provide the same files (e.g. `/usr/bin/kak`)
