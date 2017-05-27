@@ -1,0 +1,57 @@
+pkgname="kakoune-nightly-lenormf-debug"
+pkgver=latest
+pkgrel=1
+pkgdesc="An experiment for a better code editor by mawww"
+options=(!buildflags !debug !strip)
+arch=("i686" "x86_64")
+url="https://github.com/mawww/kakoune"
+license=("custom:unlicense")
+conflicts=("kakoune-git" "kakoune-nightly-lenormf")
+depends=("ncurses" "boost")
+optdepends=("xorg-xmessage: for nicer debugging messages"
+            "xdotool: add support for kak windows switching (in grep, make... files)"
+            "clang: add command for C/CPP insert mode completion support"
+            "universal-ctags-git: provides \`readtags\` used by \`:tag\` command to jump on a tag definition"
+            "tmux: tabbing support")
+makedepends=("git" "asciidoc" "ccache")
+checkdepends=("diffutils" "findutils" "sed")
+source=(
+    "${pkgname}::git+https://github.com/mawww/kakoune.git"
+    "pr-readline-shortcuts-prompt.patch::https://github.com/mawww/kakoune/pull/800.patch"
+    "pr-buflist.patch::https://github.com/mawww/kakoune/pull/1065.patch"
+    "pr-overflow-check.patch::https://github.com/mawww/kakoune/pull/1306.patch"
+)
+sha256sums=(
+    "SKIP"
+    "454b332c2552a8628947d35ef89a9207b4feb72b7598a4ab77cfac852517ea27"
+    "de3f1229f3734f78cbe750f216a0fd517570bff35ed17d26abdf39ca3952ef1b"
+    "e43c9ec89c106fecf632955b9d4f7992802c45f67d028b1143333fd8928beb54"
+)
+
+pkgver() {
+  cd "${srcdir}/${pkgname}"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+check() {
+  cd "${srcdir}/${pkgname}/src"
+  make test
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  for patch in "${srcdir}"/*.patch; do
+        patch -p1 < "${patch}"
+  done
+
+  cd src
+  make CXX=/usr/lib/ccache/bin/g++ debug=yes
+}
+
+package() {
+    cd "${srcdir}/${pkgname}/src"
+    make install DESTDIR="${pkgdir}" PREFIX=/usr CXX=/usr/lib/ccache/bin/g++ debug=yes
+
+    install -D ../UNLICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
