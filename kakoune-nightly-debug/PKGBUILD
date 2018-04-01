@@ -6,7 +6,7 @@ options=(!buildflags !debug !strip)
 arch=("i686" "x86_64")
 url="https://github.com/mawww/kakoune"
 license=("custom:unlicense")
-conflicts=("kakoune-git" "kakoune-nightly")
+conflicts=("kakoune-git" "kakoune-nightly-lenormf" "kakoune-nightly-lenormf-debug" "kakoune-nightly")
 depends=("ncurses" "boost")
 optdepends=("xorg-xmessage: for nicer debugging messages"
             "xdotool: add support for kak windows switching (in grep, make... files)"
